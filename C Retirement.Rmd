@@ -1,0 +1,122 @@
+---
+title: "Portfolio"
+author: "Philip Rubin-Streit"
+date: "8/28/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r }
+require(ggplot2)
+require(devtools)
+#Updated on 4/12/2021
+n <- 1000 #number of simulations
+pre_years <- 30
+# post_years <- 30
+starting <- 12e6
+pre_return <-.02 #after net inflation
+pre_stdevreturn <-.2 #reduced stdev if low return
+contribution <- 0
+# post_return <-.02 #after net inflation
+# post_stdevreturn <-.05 #reduced stdev if low return
+withdrawal <- 200e3
+# extra <- 1e6
+pre_account <-matrix(starting,n,pre_years) #after retirement and -80k or #before retirement +12k
+# post_account <-matrix(starting,n,post_years)
+
+for(j in 1:n){ #n simulations
+  irr <- matrix(rnorm(pre_years ,pre_return,pre_stdevreturn),pre_years,1) #after net inflation
+  for(i in 1:(pre_years-1)){
+    pre_account[j,i+1]=(1+irr[i])*pre_account[j,i] +contribution
+    #print(paste("annual growth in retirement",portfolio[j,i+1]))
+    #print(paste("years",i+1))
+  }
+}
+print(paste("Mean Amount Starting Retirement $",mean(pre_account[,pre_years])/1000000,"Million"))
+print(paste("Median Amount Starting Retirement $",median(pre_account[,pre_years])/1000000,"Million"))
+# print(paste("quantiles Amount Starting Retirement $",quantile(pre_account[,pre_years])/1000000,"Million"))
+quantile(pre_account[,pre_years], prob = seq(0, 1, length = 21), type = 5)/1000000
+print(paste("Minimum Amount Starting Retirement",min(pre_account[,pre_years])))
+print(paste("Proportion at Zero Starting Retirement",sum(pre_account[,pre_years]<=0)/n))
+print(paste("Proportion above $2Mill Starting Retirement",sum(pre_account[,pre_years]>2e6)/n*100,"%"))
+print(paste("Quantile",c(" 0%","25%","50%","75%","100%"),"at 100 years old is",quantile(pre_account[,pre_years])/1000000,"Million"))
+
+# 
+# rm(irr) 
+# for(j in 1:n){
+# post_account[j,1] <-pre_account[j,pre_years] + extra
+# mean(pre_account[,pre_years] )
+# }
+# for(j in 1:n){ #n simulations
+# irr <- matrix(rnorm(post_years ,post_return,post_stdevreturn),post_years,1) #after net inflation
+#   for(i in 1:(post_years-1)){
+#     if((1+irr[i])*post_account[j,i]-withdrawal > 0){
+#       post_account[j,i+1]=(1+irr[i])*post_account[j,i]-withdrawal
+#     } else{
+#       post_account[j,i+1]=0
+#     }
+#     #print(paste(j))
+#   }
+# }
+# ecdf_fun <- function(x,perc) {
+#   ecdf(x)(perc)
+# }
+# 
+# print(paste("Mean Amount at ",post_years+37+pre_years,mean(post_account[,post_years])/1000000,"Million"))
+# print(paste("Median Amount at ",post_years+37+pre_years,median(post_account[,post_years])/1000000,"Million"))
+# print(paste("Quantile",c(" 0%","20%","40%","60%","80%","100%"),"at",post_years+37+pre_years, "years old is",quantile(post_account[,post_years])/1000000,"Million"))
+# print(paste("Minimum Amount at ",post_years+37+pre_years,min(post_account[,post_years])/1000000,"Million"))
+# print(paste("Proportion at Zero at ",post_years+37+pre_years,sum(post_account[,post_years]<=0)/n))
+# # quantile(post_account[,post_years])/1e6
+# #quantile(x, probs = seq(0, 1, 1/12))    # Duo-deciles or dodeciles
+# quantile(post_account[,post_years], prob = seq(0, 1, length = 11), type = 5)/1000000
+# print(paste("Percent chance for $2Million at ",post_years+37+pre_years,"is ", (1-ecdf_fun(post_account[,post_years],2e6))*100,"%"))
+nums <- as.vector(pre_account[,pre_years])
+# # 
+# # typeof(post_account[,post_years])
+# # as.data.frame(post_account[,post_years])
+# # 
+# # typeof(df)
+# # ggplot(data,aes(x=value)) + geom_histogram()
+# # 
+# # qplot(df)
+# # data1 = t(data.frame(post_account[,post_years]))
+# # # 
+# # typeof(post_account[,post_years])
+# # as.data.frame(post_account[,post_years])
+# # 
+# # typeof(df)
+# # ggplot(data,aes(x=value)) + geom_histogram()
+# # 
+# # qplot(df)
+# # data1 = t(data.frame(post_account[,post_years]))
+# # 
+# 
+# # typeof(get(ls()))
+# # # library (plyr)
+# # # df <- ldply (post_account[,post_years], data.frame)
+# # # df2 = as.numeric(df)
+# # hist(data1)
+# # typeof(df[1])
+# # 
+# # # 
+# # # portfolio
+# # # mean(value)/1000000 #In millions
+# # data=data.frame(post_account[,post_years])
+# # #data
+# # #require(scales)
+# # 
+# # data <- unlist(data)
+# # data <- data.frame(data)
+# options(scipen=10000)
+# # p <- ggplot(data, aes(x=data))
+# # p<- ggplot(data=data.frame(portfolio[0,30]),aes(x=portfolio[,30])) +   xlim(c(100000,5000000))+  geom_histogram(binwidth=300000) + ylab("Density") +geom_vline(aes(xintercept=mean(portfolio, na.rm=T)),   color="red", linetype="dashed", size=1)                                                                                                                                         h<-hist(portfolio[,30],xlim=c(1000000,6000000),prob=TRUE)
+# # p+ scale_x_continuous(name="Outcome", labels = comma)
+hist(nums,xlim=c(-1000000,11000000),col= "green",breaks = 1000, freq=TRUE, labels = FALSE)
+# p
+# hist(data)
+# nums
+```
